@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 
 export default function Input({ onFetchProduct }) {
   const [url, setURL] = useState('');
-
   const handleFetchData = async () => {
+    onFetchProduct(null, true);
     const response = await fetch(`http://localhost:3001/scrape?url=${url}`);
     const data = await response.json();
-    onFetchProduct(data); // Send the fetched data to the parent component
+    onFetchProduct(data, false); // Send the fetched data to the parent component
+    setURL('');
   };
 
   return (
