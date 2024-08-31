@@ -1,18 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-export default function Product() {
-  const [product, setProduct] = useState({ title: '', imgURL: '', priceTxt: '' });
-
-  useEffect(() => {
-    async function fetchData() {
-      const response = await fetch('http://localhost:3001/scrape?url=URL_TO_SCRAPE');
-      const data = await response.json();
-      setProduct(data);
-    }
-
-    fetchData();
-  }, []);
-
+export default function Product({ product }) {
   return (
     <div className="flex justify-center h-screen items-center">
       <div className="max-w-xs bg-white shadow-md rounded-lg transform hover:-rotate-2 transition-transform duration-200 cursor-pointer">
@@ -29,7 +17,7 @@ export default function Product() {
               <path d="M9.049 2.927a.25.25 0 01.902 0l1.513 3.065a.25.25 0 00.188.137l3.384.492a.25.25 0 01.138.426l-2.45 2.39a.25.25 0 00-.072.221l.579 3.373a.25.25 0 01-.363.263L10 12.348a.25.25 0 00-.233 0l-3.03 1.592a.25.25 0 01-.363-.263l.579-3.373a.25.25 0 00-.072-.221l-2.45-2.39a.25.25 0 01.138-.426l3.384-.492a.25.25 0 00.188-.137l1.513-3.065z" />
             </svg>
             <p className="ml-2 text-sm font-medium">
-              <b>4.84</b> (190)
+              <i>{product.ratingTxt}</i>
             </p>
           </div>
         </div>
