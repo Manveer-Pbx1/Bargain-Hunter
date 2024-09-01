@@ -1,6 +1,7 @@
-import express from 'express';
-import { scrape } from './scrape.js';
-import cors from "cors";
+const express = require('express');
+const { scrape } = require('./scrape.js');
+const cors = require('cors');
+
 const app = express();
 const PORT = 3001;
 
