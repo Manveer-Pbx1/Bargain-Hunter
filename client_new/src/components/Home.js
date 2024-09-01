@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaUser } from 'react-icons/fa';
 import Product from './Product';
 import Input from './Input';
 
@@ -17,22 +18,28 @@ export default function Home() {
     <div className="relative min-h-screen">
       {loading ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 z-10">
-          <Input onFetchProduct={handleProductData} />
-          <div className="flex flex-col items-center mt-8">
-            <div className="max-w-xs bg-white shadow-md rounded-lg transform hover:-rotate-2 transition-transform duration-200 cursor-pointer">
-              <div className="animate-pulse w-full h-32 bg-gray-300 rounded-t-lg"></div>
-              <div className="p-4">
-                <div className="animate-pulse h-4 bg-gray-300 rounded mb-2"></div>
-                <div className="animate-pulse h-4 bg-gray-300 rounded mb-2"></div>
-                <div className="animate-pulse h-4 bg-gray-300 rounded mb-2"></div>
-                <div className="flex items-center mt-2">
-                  <div className="animate-pulse bg-gray-300 rounded w-4 h-4 text-yellow-400"></div>
-                  <div className="animate-pulse ml-2 h-4 bg-gray-300 rounded w-16"></div>
-                </div>
-              </div>
-            </div>
+          {/* Loading animation */}
+          <svg
+            className="animate-spin h-10 w-10 text-gray-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8.001 8.001 0 0120.709 5H16v2h4.709A6.002 6.002 0 0012 6.472V2H8v4.472A6.002 6.002 0 003.291 7z"
+            ></path>
+          </svg>  
           </div>
-        </div>
       ) : (
         <>
           <Input onFetchProduct={handleProductData} />
@@ -43,6 +50,9 @@ export default function Home() {
           </div>
         </>
       )}
+      <div className="absolute top-4 right-4">
+        <FaUser className="text-3xl text-gray-600" />
+      </div>
     </div>
   );
 }
