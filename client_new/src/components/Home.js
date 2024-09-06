@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { FaUser } from 'react-icons/fa';
 import Product from './Product';
 import Input from './Input';
+import { useLocation } from 'react-router-dom';
 
 export default function Home() {
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const location = useLocation();
+  const name = location.state?.username || sessionStorage.getItem('username');
   const handleProductData = (data, isLoading) => {
     if (data) {
       setProductList((prevList) => [...prevList, data]);
@@ -52,6 +54,7 @@ export default function Home() {
       )}
       <div className="absolute top-4 right-4">
         <FaUser className="text-3xl text-gray-600" />
+        <span className="text-gray-600 font-bold text-center">{name? name : ""}</span>
       </div>
     </div>
   );

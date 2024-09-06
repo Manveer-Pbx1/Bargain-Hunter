@@ -7,15 +7,11 @@ export default function LandingPage() {
     <div>
       <Custom
         text="Track Your Wishlisted Products"
-        x="65px"
-        y="150px"
         color={"rgb(255,70,55)"}
         txt="white"
       />
       <Custom
         text="Get Notified when price drops!"
-        x="65px"
-        y="150px"
         color="rgb(255,255,100)"
         txt="rgb(0,120,255)"
       />
