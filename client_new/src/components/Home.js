@@ -52,9 +52,9 @@ export default function Home() {
           </div>
         </>
       )}
-      <div className="absolute top-4 right-4">
-        <FaUser className="text-3xl text-gray-600" />
-        <span className="text-gray-600 font-bold text-center">{name? name : ""}</span>
+      <div className="relative -top-16 float-right flex">
+        <FaUser className="text-3xl text-gray-400" />
+        <span className="text-blue-600 h-1 w-1 font-bold relative top-10 justify-center right-5 items-center flex mr-[100px]">Manveer</span>
       </div>
     </div>
   );
