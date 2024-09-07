@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Home from "./Home";
 import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
@@ -33,7 +32,7 @@ export default function SignUp() {
       }
     };
     checkAuth();
-  }, [navigate]);
+  }, [formData.username,navigate]);
 
   const handleChange = (e) => {
     setFormData({
