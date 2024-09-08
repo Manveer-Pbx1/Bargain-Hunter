@@ -121,6 +121,15 @@ app.get('/auth-check', (req, res) => {
   });
 });
 
+// Logout route
+app.get('/logout', (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: false
+  });
+  res.json({success: true, message: "Logged out successfully"})
+});
+
 // Scrape route (example)
 app.get('/scrape', async (req, res) => {
   const url = req.query.url;
