@@ -12,7 +12,7 @@ export default function App() {
       <Route path= "/" element = {<LandingPage/>} />
       <Route path= "/signup" element = {<SignUp/>}/>
       <Route path= "/login" element = {<Login/>}/>
-      <Route path= "/home" element = {<ProtectedRoute element={<Home/>}/>}/>
+      <Route path= "/home" element = {<ProtectedRoute component={Home}/>}/>
     </Routes>
    </Router>
   )

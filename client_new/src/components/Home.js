@@ -1,20 +1,32 @@
-import React, { useState } from 'react';
-import { FaUser } from 'react-icons/fa';
-import Product from './Product';
-import Input from './Input';
-import { useLocation } from 'react-router-dom';
-
+import React, { useState } from "react";
+import { FaUser } from "react-icons/fa";
+import Product from "./Product";
+import Input from "./Input";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 export default function Home() {
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [userMenu, setUserMenu] = useState(false);
   const location = useLocation();
-  const name = location.state?.username || sessionStorage.getItem('username');
+  const navigate = useNavigate();
+  const name = location.state?.username || sessionStorage.getItem("username");
   const handleProductData = (data, isLoading) => {
     if (data) {
       setProductList((prevList) => [...prevList, data]);
     }
     setLoading(isLoading);
   };
+
+  const handleLogout = async () => {
+    try{
+      await axios.get("http://localhost:3001/logout", {withCredentials: true});
+      sessionStorage.removeItem("username");
+      navigate('/login');
+    } catch (err){
+      console.error(err);
+    }
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -40,8 +52,8 @@ export default function Home() {
               fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8.001 8.001 0 0120.709 5H16v2h4.709A6.002 6.002 0 0012 6.472V2H8v4.472A6.002 6.002 0 003.291 7z"
             ></path>
-          </svg>  
-          </div>
+          </svg>
+        </div>
       ) : (
         <>
           <Input onFetchProduct={handleProductData} />
@@ -53,8 +65,23 @@ export default function Home() {
         </>
       )}
       <div className="relative -top-16 float-right flex">
-        <FaUser className="text-3xl text-gray-400" />
-        <span className="text-blue-600 h-1 w-1 font-bold relative top-10 justify-center right-5 items-center flex mr-[100px]">{name}</span>
+        <FaUser
+          className={`text-3xl ${
+            userMenu ? `text-black` : `text-gray-400`
+          } cursor-pointer`}
+          onClick={() => setUserMenu(!userMenu)}
+        />
+        {userMenu && (
+          <div className="h-[15px] w-[100px] top-[60px] right-1/2 absolute bg-red-300 p-3 rounded-md">
+            <button className="text-sm font-semibold text-red-700 absolute bottom-1 left-6"
+            onClick={handleLogout}>
+              Log out
+            </button>
+          </div>
+        )}
+        <span className="text-blue-600 h-1 w-1 font-bold relative top-10 justify-center right-5 items-center flex mr-[100px]">
+          {name}
+        </span>
       </div>
     </div>
   );

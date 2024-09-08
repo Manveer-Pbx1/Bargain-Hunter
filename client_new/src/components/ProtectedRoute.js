@@ -1,18 +1,14 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-export default function ProtectedRoute({ element: Component, ...rest }) {
+export default function ProtectedRoute({ component: Component, ...rest }) {
   const isAuthenticated = checkAuth();
 
-  function checkAuth() {
-    // Get all cookies
-    const cookies = document.cookie.split(';');
-    // Find the token
-    const token = cookies.find(cookie => cookie.trim().startsWith('token='));
-    // If token exists, return true, otherwise return false
+ async function checkAuth() {
+    const token = await document.cookie.split(';').find(cookie => cookie.trim().startsWith('token='));
     return token !== undefined;
+    //debugged: async-await was required.
   }
 
-  return isAuthenticated ? 
-  <Component {...rest} /> : <Navigate to="/login"/>
+  return isAuthenticated ? <Component {...rest} /> : <Navigate to="/login" />;
 }
