@@ -3,6 +3,7 @@ const { scrape } = require('./scrape.js');
 const cors = require('cors');
 const connectDB = require('./connect.js');
 const User = require('./models/User.js');
+const Product = require('./models/Product.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
@@ -28,6 +29,22 @@ const transporter = nodemailer.createTransport({
 });
 
 const verificationCodes = {};
+
+// Middleware to authenticate the user
+const authenticateUser = (req, res, next) => {
+  const token = req.cookies.token;
+  console.log("token: ", token);
+  if (!token) return res.status(401).json({ message: "Unauthorized hai bhai" });
+
+  jwt.verify(token, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', (err, decoded) => {
+    if (err){ 
+      console.log("error: ", err);
+      return res.status(401).json({ message: "Unauthorized" });
+  }
+    req.user = decoded; // Save user info from token
+    next();
+  });
+};
 
 // Sign-up route
 app.post('/signup', async (req, res) => {
@@ -96,12 +113,12 @@ app.post('/login', async (req, res) => {
   }
 
   // Generate JWT token
-  const token = jwt.sign({ username }, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', { expiresIn: '1h' });
+  const token = jwt.sign({ username: user.username, id: user._id }, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', { expiresIn: '1h' });
 
   // Set token as cookie
   res.cookie('token', token, {
     httpOnly: true,
-    secure: false, // Set to true in production with HTTPS
+    secure: false, 
     maxAge: 3600000, // 1 hour
   });
 
@@ -127,20 +144,91 @@ app.get('/logout', (req, res) => {
     httpOnly: true,
     secure: false
   });
-  res.json({success: true, message: "Logged out successfully"})
+  res.json({success: true, message: "Logged out successfully"});
+});
+
+// // Route to add a product for the logged-in user
+// app.post('/products', authenticateUser, async (req, res) => {
+//   const { title, price, rating } = req.body;
+
+//   try {
+//     const newProduct = new Product({
+//       title,
+//       price,
+//       rating,
+//       user: req.user.id, // Associate product with logged-in user
+//     });
+//     await newProduct.save();
+
+//     // Also update user's product list
+//     await User.findByIdAndUpdate(req.user.id, {
+//       $push: { products: newProduct._id },
+//     });
+
+//     res.json({ success: true, product: newProduct });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error adding product" });
+//   }
+// });
+
+// Route to get products for the logged-in user
+app.get('/products', authenticateUser, async (req, res) => {
+  try {
+    const userProducts = await Product.find({ user: req.user.username});
+    res.json({ success: true, products: userProducts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching products" });
+  }
 });
 
 // Scrape route (example)
 app.get('/scrape', async (req, res) => {
   const url = req.query.url;
+  const token = req.cookies.token;
 
-  try {
-    const productData = await scrape(url);
-    res.json(productData);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to scrape the data' });
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized. Please log in.' });
   }
+
+  jwt.verify(token, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', async (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid token' });
+    }
+
+    try {
+      const userId = decoded.id; // Assuming the token has the user ID
+      const productData = await scrape(url);
+
+      // Log productData to check what's being scraped
+      console.log('Scraped Product Data:', productData);
+
+      // Check if any fields are missing
+      if (!productData.title || !productData.priceTxt || !productData.ratingTxt) {
+        return res.status(400).json({ error: 'Missing product data fields (title, price, or rating)' });
+      }
+
+      const newProduct = new Product({
+        title: productData.title,
+        price: productData.priceTxt,
+        rating: productData.ratingTxt,
+        imgURL: productData.imgURL,
+        user: userId
+      });
+
+      await newProduct.save();
+      res.json(productData);
+    } catch (error) {
+      console.error('Error scraping data:', error);
+      res.status(500).json({ error: 'Failed to scrape the data' });
+    }
+  });
 });
+
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

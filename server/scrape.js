@@ -8,16 +8,12 @@ async function scrape(url) {
     // Load the HTML into Cheerio
     const $ = cheerio.load(data);
 
-    // Extract the title
     const title = $("#productTitle").text().trim();
 
-    // Extract the image URL
     const imgURL = $("#landingImage").attr("src");
 
-    // Extract the price
     const priceTxt = $(".a-price-whole").first().text().trim();
 
-    // Extract the rating
     const ratingTxt = $(".a-size-base .a-color-base").first().text().trim();
 
     console.log({ title, imgURL, priceTxt, ratingTxt });
