@@ -4,6 +4,7 @@ import Product from "./Product";
 import Input from "./Input";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 export default function Home() {
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -11,22 +12,40 @@ export default function Home() {
   const location = useLocation();
   const navigate = useNavigate();
   const name = location.state?.username || sessionStorage.getItem("username");
-  const handleProductData = (data, isLoading) => {
+
+  // Handle adding product to state and backend
+  const handleProductData = async (data, isLoading) => {
     if (data) {
-      setProductList((prevList) => [...prevList, data]);
+      try {
+        // Make a POST request to save the product in the database
+        const response = await axios.post("http://localhost:3001/products", {
+          title: data.title,
+          price: data.priceTxt,
+          rating: data.ratingTxt,
+        }, { withCredentials: true });
+
+        // Check if product is successfully saved
+        if (response.data.success) {
+          setProductList((prevList) => [...prevList, data]);
+        } else {
+          console.error("Failed to save product:", response.data.message);
+        }
+      } catch (err) {
+        console.error("Error saving product:", err);
+      }
     }
     setLoading(isLoading);
   };
 
   const handleLogout = async () => {
-    try{
-      await axios.get("http://localhost:3001/logout", {withCredentials: true});
+    try {
+      await axios.get("http://localhost:3001/logout", { withCredentials: true });
       sessionStorage.removeItem("username");
       navigate('/login');
-    } catch (err){
+    } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   return (
     <div className="relative min-h-screen">
@@ -74,7 +93,7 @@ export default function Home() {
         {userMenu && (
           <div className="h-[15px] w-[100px] top-[60px] right-1/2 absolute bg-red-300 p-3 rounded-md">
             <button className="text-sm font-semibold text-red-700 absolute bottom-1 left-6"
-            onClick={handleLogout}>
+              onClick={handleLogout}>
               Log out
             </button>
           </div>
