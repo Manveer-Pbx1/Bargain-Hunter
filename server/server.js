@@ -33,7 +33,6 @@ const verificationCodes = {};
 // Middleware to authenticate the user
 const authenticateUser = (req, res, next) => {
   const token = req.cookies.token;
-  console.log("token: ", token);
   if (!token) return res.status(401).json({ message: "Unauthorized hai bhai" });
 
   jwt.verify(token, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', (err, decoded) => {
@@ -147,35 +146,36 @@ app.get('/logout', (req, res) => {
   res.json({success: true, message: "Logged out successfully"});
 });
 
-// // Route to add a product for the logged-in user
-// app.post('/products', authenticateUser, async (req, res) => {
-//   const { title, price, rating } = req.body;
+// Route to add a product for the logged-in user
+app.post('/products', authenticateUser, async (req, res) => {
+  const { title, price, rating, imgURL } = req.body;  // Use 'price', 'rating' instead of 'priceTxt', 'ratingTxt'
 
-//   try {
-//     const newProduct = new Product({
-//       title,
-//       price,
-//       rating,
-//       user: req.user.id, // Associate product with logged-in user
-//     });
-//     await newProduct.save();
+  try {
+    const newProduct = new Product({
+      title,
+      price,   // Update this to 'price' to match the schema
+      rating,  // Update this to 'rating'
+      imgURL,
+      user: req.user.id, // Associate product with logged-in user
+    });
+    await newProduct.save();
 
-//     // Also update user's product list
-//     await User.findByIdAndUpdate(req.user.id, {
-//       $push: { products: newProduct._id },
-//     });
+    // Also update user's product list
+    await User.findByIdAndUpdate(req.user.id, {
+      $push: { products: newProduct._id },
+    });
 
-//     res.json({ success: true, product: newProduct });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Error adding product" });
-//   }
-// });
+    res.json({ success: true, product: newProduct });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error adding product" });
+  }
+});
 
 // Route to get products for the logged-in user
 app.get('/products', authenticateUser, async (req, res) => {
   try {
-    const userProducts = await Product.find({ user: req.user.username});
+    const userProducts = await Product.find({ user: req.user.id});
     res.json({ success: true, products: userProducts });
   } catch (error) {
     console.error(error);
@@ -205,19 +205,19 @@ app.get('/scrape', async (req, res) => {
       console.log('Scraped Product Data:', productData);
 
       // Check if any fields are missing
-      if (!productData.title || !productData.priceTxt || !productData.ratingTxt) {
+      if (!productData.title || !productData.price || !productData.rating) {
         return res.status(400).json({ error: 'Missing product data fields (title, price, or rating)' });
       }
 
       const newProduct = new Product({
         title: productData.title,
-        price: productData.priceTxt,
-        rating: productData.ratingTxt,
+        price: productData.price,
+        rating: productData.rating,
         imgURL: productData.imgURL,
         user: userId
       });
 
-      await newProduct.save();
+      // await newProduct.save();
       res.json(productData);
     } catch (error) {
       console.error('Error scraping data:', error);
