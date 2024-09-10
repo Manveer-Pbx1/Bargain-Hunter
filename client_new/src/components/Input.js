@@ -13,12 +13,10 @@ export default function Input({ onFetchProduct }) {
         method: 'GET',
         credentials: 'include',
       })
-      .then(response=> response.json())
-      .then(data => console.log(data));
       
-      if (!response.ok) {
+      if(!response.ok)
         throw new Error("Failed to fetch product data. Please check the URL and try again.");
-      }
+
 
       const data = await response.json();
       onFetchProduct(data, false); // Send the fetched data to the parent component
@@ -38,11 +36,11 @@ export default function Input({ onFetchProduct }) {
           value={url}
           onChange={(e) => setURL(e.target.value)}
           placeholder="Enter URL to scrape"
-          className="border border-gray-300 p-2 rounded-lg mr-2"
+          className="border-black p-2 border-2 mr-2 font-bold"
         />
         <button
           onClick={handleFetchData}
-          className="bg-blue-500 text-white p-2 rounded-lg"
+          className="bg-blue-500 text-white p-2 font-bold  italic border-2 border-black"
         >
           Fetch Product
         </button>

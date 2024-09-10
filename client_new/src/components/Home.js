@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa";
 import Product from "./Product";
 import Input from "./Input";
+import { IoIosPricetag } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -13,20 +14,20 @@ export default function Home() {
   const navigate = useNavigate();
   const name = location.state?.username || sessionStorage.getItem("username");
 
-  // Handle adding product to state and backend
   const handleProductData = async (data, isLoading) => {
     if (data) {
       try {
         // Make a POST request to save the product in the database
         const response = await axios.post("http://localhost:3001/products", {
           title: data.title,
-          price: data.priceTxt,
-          rating: data.ratingTxt,
+          price: data.price,
+          rating: data.rating,
+          imgURL: data.imgURL,
         }, { withCredentials: true });
-
-        // Check if product is successfully saved
+  
+        // Check if the product is successfully saved
         if (response.data.success) {
-          setProductList((prevList) => [...prevList, data]);
+          setProductList((prevList) => [...prevList, data]); // Update product list with the fetched product
         } else {
           console.error("Failed to save product:", response.data.message);
         }
@@ -34,8 +35,9 @@ export default function Home() {
         console.error("Error saving product:", err);
       }
     }
-    setLoading(isLoading);
+    setLoading(isLoading); // Stop the loading animation
   };
+  
 
   const handleLogout = async () => {
     try {
@@ -46,6 +48,30 @@ export default function Home() {
       console.error(err);
     }
   };
+
+  //get all the products for the associated user :)
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get("http://localhost:3001/products", {
+          withCredentials: true
+        });
+
+        if (response.data.success) {
+          setProductList(response.data.products); // Set the fetched products to state
+        } else {
+          console.error("Failed to fetch products");
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div className="relative min-h-screen">
@@ -76,14 +102,7 @@ export default function Home() {
       ) : (
         <>
           <Input onFetchProduct={handleProductData} />
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-            {productList.map((prod, index) => (
-              <Product key={index} product={prod} />
-            ))}
-          </div>
-        </>
-      )}
-      <div className="relative -top-16 float-right flex">
+          <div className="relative -top-16 float-right flex">
         <FaUser
           className={`text-3xl ${
             userMenu ? `text-black` : `text-gray-400`
@@ -102,6 +121,15 @@ export default function Home() {
           {name}
         </span>
       </div>
+      <h1 className="relative top-20 ml-8 font-bold text-2xl inline-flex">Your Products  <IoIosPricetag className="ml-2 text-3xl"/></h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+            {productList.map((prod, index) => (
+              <Product key={index} product={prod} />
+            ))}
+          </div>
+        </>
+      )}
+      
     </div>
   );
 }
