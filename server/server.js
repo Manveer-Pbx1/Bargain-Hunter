@@ -8,29 +8,28 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const nodemailer = require('nodemailer');
+const cron = require('node-cron');
 const app = express();
 const PORT = 3001;
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Replace with your frontend URL
-  credentials: true, // Allow cookies to be sent
+  origin: 'http://localhost:3000', 
+  credentials: true, 
 }));
 app.use(express.json());
 app.use(cookieParser());
 connectDB();
 
-// nodemailer configuration
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'revistergetconsistent@gmail.com', // Use your Gmail account
-    pass: 'kamj xxkx ljrz elsn' // Gmail app password, not your login password
+    user: 'revistergetconsistent@gmail.com', 
+    pass: 'kamj xxkx ljrz elsn' 
   }
 });
 
 const verificationCodes = {};
 
-// Middleware to authenticate the user
 const authenticateUser = (req, res, next) => {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Unauthorized hai bhai" });
@@ -40,12 +39,11 @@ const authenticateUser = (req, res, next) => {
       console.log("error: ", err);
       return res.status(401).json({ message: "Unauthorized" });
   }
-    req.user = decoded; // Save user info from token
+    req.user = decoded; 
     next();
   });
 };
 
-// Sign-up route
 app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
   const userExists = await User.findOne({ email });
@@ -59,11 +57,9 @@ app.post('/signup', async (req, res) => {
     const newUser = new User({ username, email, password: hashedPass });
     await newUser.save();
 
-    // Generate a random verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
     verificationCodes[email] = verificationCode;
 
-    // Email options
     const mailOptions = {
       from: 'revistergetconsistent@gmail.com',
       to: email,
@@ -87,7 +83,6 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// Email verification route
 app.post('/verify', (req, res) => {
   const { email, verificationCode } = req.body;
 
@@ -98,7 +93,6 @@ app.post('/verify', (req, res) => {
   }
 });
 
-// Login route with cookie generation
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
@@ -111,20 +105,17 @@ app.post('/login', async (req, res) => {
     return res.json({ success: false, message: "Invalid password" });
   }
 
-  // Generate JWT token
   const token = jwt.sign({ username: user.username, id: user._id }, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', { expiresIn: '1h' });
 
-  // Set token as cookie
   res.cookie('token', token, {
     httpOnly: true,
     secure: false, 
-    maxAge: 3600000, // 1 hour
+    maxAge: 3600000, 
   });
 
   res.json({ success: true, message: "Logged in successfully", token });
 });
 
-// Check authentication status
 app.get('/auth-check', (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.json({ authenticated: false });
@@ -137,7 +128,6 @@ app.get('/auth-check', (req, res) => {
   });
 });
 
-// Logout route
 app.get('/logout', (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
@@ -146,21 +136,21 @@ app.get('/logout', (req, res) => {
   res.json({success: true, message: "Logged out successfully"});
 });
 
-// Route to add a product for the logged-in user
 app.post('/products', authenticateUser, async (req, res) => {
-  const { title, price, rating, imgURL } = req.body;  // Use 'price', 'rating' instead of 'priceTxt', 'ratingTxt'
+  const { title, price, rating, imgURL, url } = req.body;  
 
   try {
     const newProduct = new Product({
       title,
-      price,   // Update this to 'price' to match the schema
-      rating,  // Update this to 'rating'
+      price,  
+      rating,  
       imgURL,
-      user: req.user.id, // Associate product with logged-in user
+      url,
+      user: req.user.id, 
     });
+    console.log("Saving product...");
     await newProduct.save();
 
-    // Also update user's product list
     await User.findByIdAndUpdate(req.user.id, {
       $push: { products: newProduct._id },
     });
@@ -172,7 +162,6 @@ app.post('/products', authenticateUser, async (req, res) => {
   }
 });
 
-// Route to get products for the logged-in user
 app.get('/products', authenticateUser, async (req, res) => {
   try {
     const userProducts = await Product.find({ user: req.user.id});
@@ -183,7 +172,6 @@ app.get('/products', authenticateUser, async (req, res) => {
   }
 });
 
-// Scrape route (example)
 app.get('/scrape', async (req, res) => {
   const url = req.query.url;
   const token = req.cookies.token;
@@ -198,13 +186,11 @@ app.get('/scrape', async (req, res) => {
     }
 
     try {
-      const userId = decoded.id; // Assuming the token has the user ID
+      const userId = decoded.id; 
       const productData = await scrape(url);
 
-      // Log productData to check what's being scraped
       console.log('Scraped Product Data:', productData);
 
-      // Check if any fields are missing
       if (!productData.title || !productData.price || !productData.rating) {
         return res.status(400).json({ error: 'Missing product data fields (title, price, or rating)' });
       }
@@ -214,10 +200,10 @@ app.get('/scrape', async (req, res) => {
         price: productData.price,
         rating: productData.rating,
         imgURL: productData.imgURL,
+        url: productData.url,
         user: userId
       });
 
-      // await newProduct.save();
       res.json(productData);
     } catch (error) {
       console.error('Error scraping data:', error);
@@ -226,7 +212,51 @@ app.get('/scrape', async (req, res) => {
   });
 });
 
+const sendPriceChangeEmail = async (email, productTitle, oldPrice, newPrice) => {
+  const mailOptions = {
+    from: 'revistergetconsistent@gmail.com',
+    to: email,
+    subject: `Price Change Alert for ${productTitle}`,
+    text: `The price of ${productTitle} has changed from $${oldPrice} to $${newPrice}.`
+  };
+  
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Email sent to ${email} for price change in ${productTitle}`);
+  } catch (error) {
+    console.error("Error sending email: ", error);
+  }
+};
 
+cron.schedule('0 0 * * *', async () => {  
+  console.log("Running scheduled price check...");
+
+  try {
+    const products = await Product.find({});
+    
+    for (const product of products) {
+      const scrapedData = await scrape(product.url);
+
+      if(scrapedData.price === product.price)
+        console.log("Price has not changed for ", product.title, scrapedData.price, product.price);
+      if (scrapedData.price !== product.price) {
+        const oldPrice = parseInt(product.price);
+        const newPrice = parseInt(scrapedData.price);
+
+        product.price = newPrice;
+        await product.save();
+
+        const user = await User.findById(product.user);
+        if (user) {
+          await sendPriceChangeEmail(user.email, product.title, oldPrice, newPrice);
+        }
+      }
+    }
+    console.log("Price check completed successfully.");
+  } catch (error) {
+    console.error("Error during price check:", error);
+  }
+});
 
 
 
