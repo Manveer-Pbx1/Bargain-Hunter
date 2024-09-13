@@ -12,12 +12,14 @@ async function scrape(url) {
 
     const imgURL = $("#landingImage").attr("src");
 
-    const price = $(".a-price-whole").first().text().trim();
+    const priceString = $(".a-price-whole").first().text().trim();
+    const price = parseInt(priceString.replace(/,/g, ''));
 
     const rating = $(".a-size-base .a-color-base").first().text().trim();
 
-    console.log({ title, imgURL, price, rating });
-    return { title, imgURL, price, rating };
+
+    console.log({ title, imgURL, price, rating, url });
+    return { title, imgURL, price, rating, url };
   } catch (error) {
     console.error("Error scraping the data:", error);
   }
