@@ -6,7 +6,7 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   price: {
-    type: String,
+    type: Number,
     required: true,
   },
   rating: {
@@ -16,6 +16,10 @@ const productSchema = new mongoose.Schema({
   imgURL: {
     type: String,
     required: true,
+  },
+  url: {
+    type: String,
+    required: true
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
