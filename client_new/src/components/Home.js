@@ -23,6 +23,7 @@ export default function Home() {
           price: data.price,
           rating: data.rating,
           imgURL: data.imgURL,
+          url: data.url,
         }, { withCredentials: true });
   
         // Check if the product is successfully saved

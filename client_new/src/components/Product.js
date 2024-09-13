@@ -3,6 +3,7 @@ import React from "react";
 export default function Product({ product }) {
   return (
     <div className="relative top-20 mb-2 items-center">
+    <a href={product.url}>
       <div className="max-w-xs bg-white shadow-md rounded-lg transform hover:-rotate-2 transition-transform duration-200 cursor-pointer">
         <img
           className="w-full h-32 object-cover rounded-t-lg"
@@ -26,6 +27,7 @@ export default function Product({ product }) {
           </div>
         </div>
       </div>
+        </a>
     </div>
   );
 }
