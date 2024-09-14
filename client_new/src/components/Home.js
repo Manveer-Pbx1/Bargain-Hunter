@@ -74,6 +74,24 @@ export default function Home() {
     fetchProducts();
   }, []);
 
+  // to delete the product component
+  const handleDeletion = async (product) => {
+    console.log(product);
+    try {
+      const response = await axios.delete(`http://localhost:3001/products/${product.id}`, {
+        withCredentials: true
+      });
+
+      if (response.data.success) {
+        setProductList((prevList) => prevList.filter((prod) => prod.id !== product.id));
+      } else {
+        console.error("Failed to delete product:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   return (
     <div className="relative min-h-screen">
       {loading ? (
@@ -124,8 +142,8 @@ export default function Home() {
       </div>
       <h1 className="relative top-20 ml-8 font-bold text-2xl inline-flex">Your Products  <IoIosPricetag className="ml-2 text-3xl"/></h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-            {productList.map((prod, index) => (
-              <Product key={index} product={prod} />
+            {productList.map((prod) => (
+              <Product key={prod.id} product={prod} handleDeletion={handleDeletion} />
             ))}
           </div>
         </>
