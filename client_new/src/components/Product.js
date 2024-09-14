@@ -1,17 +1,17 @@
 import React from "react";
-
-export default function Product({ product }) {
+import { MdDelete } from "react-icons/md";
+export default function Product({ product, handleDeletion }) {
   return (
-    <div className="relative top-20 mb-2 items-center">
-    <a href={product.url}>
-      <div className="max-w-xs bg-white shadow-md rounded-lg transform hover:-rotate-2 transition-transform duration-200 cursor-pointer">
+    <div className="relative top-20 mb-2 items-center z-10">
+    <a href={product.url} target="_blank" rel="noopener noreferrer">
+      <div className="max-w-xs bg-white shadow-md rounded-lg transform hover:-rotate-2 transition-transform duration-200 cursor-pointer  hover:shadow-blue-400">
         <img
           className="w-full h-32 object-cover rounded-t-lg"
           src={product.imgURL}
           alt={product.title}
         />
         <div className="p-4">
-          <h2 className="text-lg font-semibold">{product.title}</h2>
+          <h2 className="text-lg font-semibold hover:text-blue-400">{product.title}</h2>
           <p className="mt-1 text-sm font-bold">Price: INR {product.price}</p>
           <div className="flex items-center mt-2">
             <svg
@@ -28,6 +28,9 @@ export default function Product({ product }) {
         </div>
       </div>
         </a>
+        <div onClick={()=>handleDeletion(product)} className="absolute bottom-2 right-2">
+          <MdDelete className="text-3xl transform hover:-rotate-2 transition-transform duration-200 cursor-pointer hover:text-red-500" />
+        </div>
     </div>
   );
 }
