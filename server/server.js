@@ -172,6 +172,22 @@ app.get('/products', authenticateUser, async (req, res) => {
   }
 });
 
+//route to delete product
+app.delete("/products/:id", async (req, res) => {
+  try {
+    const deletedProduct = await Product.findOneAndDelete({ id: req.params.id });
+    
+    if (deletedProduct) {
+      res.status(200).json({ success: true });
+    } else {
+      res.status(404).json({ success: false, message: "Product not found" });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error deleting product" });
+  }
+});
+
+
 app.get('/scrape', async (req, res) => {
   const url = req.query.url;
   const token = req.cookies.token;
