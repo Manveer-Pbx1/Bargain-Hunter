@@ -1,5 +1,6 @@
 // models/Product.js
 const mongoose = require('mongoose');
+const {v4: uuidv4} = require('uuid');
 const productSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -26,6 +27,11 @@ const productSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  id:{
+    type: String,
+    default: uuidv4,
+    unique: true
+  }
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);
