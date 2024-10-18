@@ -244,7 +244,7 @@ const sendPriceChangeEmail = async (email, productTitle, oldPrice, newPrice) => 
   }
 };
 
-cron.schedule('0 0 * * *', async () => {  
+cron.schedule('* * * * *', async () => {  
   console.log("Running scheduled price check...");
 
   try {
