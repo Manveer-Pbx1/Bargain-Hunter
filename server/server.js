@@ -233,7 +233,7 @@ const sendPriceChangeEmail = async (email, productTitle, oldPrice, newPrice) => 
     from: 'revistergetconsistent@gmail.com',
     to: email,
     subject: `Price Change Alert for ${productTitle}`,
-    text: `The price of ${productTitle} has changed from $${oldPrice} to $${newPrice}.`
+    text: `The price of ${productTitle} has changed from ${oldPrice} to ${newPrice}.`
   };
   
   try {
@@ -264,6 +264,7 @@ cron.schedule('0 0 * * *', async () => {
 
         const user = await User.findById(product.user);
         if (user) {
+          console.log("Sending mail...")
           await sendPriceChangeEmail(user.email, product.title, oldPrice, newPrice);
         }
       }
