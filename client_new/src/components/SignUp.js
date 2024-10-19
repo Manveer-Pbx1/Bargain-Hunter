@@ -50,7 +50,7 @@ export default function SignUp() {
 
     try {
       const response = await axios.post(
-        "https://bargain-hunter.onrender.com/signup",
+        "https://bargain-hunter.onrender.com:3001/signup",
         {
           username: formData.username,
           email: formData.email,
@@ -72,7 +72,7 @@ export default function SignUp() {
   const handleVerification = async () => {
     try {
       const response = await axios.post(
-        "https://bargain-hunter.onrender.com/verify",
+        "https://bargain-hunter.onrender.com:3001/verify",
         {
           email: formData.email,
           verificationCode: formData.verificationCode,
