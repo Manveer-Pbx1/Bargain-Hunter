@@ -9,7 +9,7 @@ export default function Input({ onFetchProduct }) {
     setError(null); // Reset any previous error
 
     try {
-      const response = await fetch(`http://localhost:3001/scrape?url=${url}`, {
+      const response = await fetch(`https://bargain-hunter.onrender.com/scrape?url=${url}`, {
         method: 'GET',
         credentials: 'include',
       })

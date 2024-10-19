@@ -17,7 +17,7 @@ export default function Login() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/auth-check", {
+        const response = await axios.get("https://bargain-hunter.onrender.com/auth-check", {
           withCredentials: true,
         });
         console.log("Auth check response: ", response.data);
@@ -43,7 +43,7 @@ export default function Login() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:3001/login",
+        "https://bargain-hunter.onrender.com/login",
         {
           username: formData.username,
           email: formData.email,

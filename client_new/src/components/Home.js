@@ -18,7 +18,7 @@ export default function Home() {
     if (data) {
       try {
         // Make a POST request to save the product in the database
-        const response = await axios.post("http://localhost:3001/products", {
+        const response = await axios.post("https://bargain-hunter.onrender.com/products", {
           title: data.title,
           price: data.price,
           rating: data.rating,
@@ -42,7 +42,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:3001/logout", { withCredentials: true });
+      await axios.get("https://bargain-hunter.onrender.com/logout", { withCredentials: true });
       sessionStorage.removeItem("username");
       navigate('/login');
     } catch (err) {
@@ -55,7 +55,7 @@ export default function Home() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:3001/products", {
+        const response = await axios.get("https://bargain-hunter.onrender.com/products", {
           withCredentials: true
         });
 
@@ -78,7 +78,7 @@ export default function Home() {
   const handleDeletion = async (product) => {
     console.log(product);
     try {
-      const response = await axios.delete(`http://localhost:3001/products/${product.id}`, {
+      const response = await axios.delete(`https://bargain-hunter.onrender.com/products/${product.id}`, {
         withCredentials: true
       });
 
