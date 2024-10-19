@@ -11,7 +11,6 @@ export default function Input({ onFetchProduct }) {
     try {
       const response = await fetch(`https://bargain-hunter.onrender.com/scrape?url=${url}`, {
         method: 'GET',
-        credentials: 'include',
       })
       
       if(!response.ok)

@@ -24,7 +24,7 @@ export default function Home() {
           rating: data.rating,
           imgURL: data.imgURL,
           url: data.url,
-        }, { withCredentials: true });
+        }, );
   
         // Check if the product is successfully saved
         if (response.data.success) {
@@ -56,7 +56,6 @@ export default function Home() {
       try {
         setLoading(true);
         const response = await axios.get("https://bargain-hunter.onrender.com/products", {
-          withCredentials: true
         });
 
         if (response.data.success) {
@@ -79,7 +78,6 @@ export default function Home() {
     console.log(product);
     try {
       const response = await axios.delete(`https://bargain-hunter.onrender.com/products/${product.id}`, {
-        withCredentials: true
       });
 
       if (response.data.success) {
