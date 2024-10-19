@@ -13,7 +13,7 @@ const app = express();
 require('dotenv').config();
 
 app.use(cors({
-  origin: 'http://localhost:3000', 
+  origin: 'https://bargain-hunter.onrender.com', 
   credentials: true, 
 }));
 app.use(express.json());
