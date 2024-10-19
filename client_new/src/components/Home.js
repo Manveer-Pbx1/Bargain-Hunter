@@ -42,7 +42,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      await axios.get("https://bargain-hunter.onrender.com/logout", { withCredentials: true });
+      await axios.get("https://bargain-hunter.onrender.com/logout");
       sessionStorage.removeItem("username");
       navigate('/login');
     } catch (err) {
