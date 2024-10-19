@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser');
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 const app = express();
-const PORT = 3001;
+require('dotenv').config();
 
 app.use(cors({
   origin: 'http://localhost:3000', 
@@ -34,7 +34,7 @@ const authenticateUser = (req, res, next) => {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Unauthorized hai bhai" });
 
-  jwt.verify(token, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', (err, decoded) => {
+  jwt.verify(token, 'JWT_SECRET', (err, decoded) => {
     if (err){ 
       console.log("error: ", err);
       return res.status(401).json({ message: "Unauthorized" });
@@ -105,7 +105,7 @@ app.post('/login', async (req, res) => {
     return res.json({ success: false, message: "Invalid password" });
   }
 
-  const token = jwt.sign({ username: user.username, id: user._id }, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', { expiresIn: '1h' });
+  const token = jwt.sign({ username: user.username, id: user._id }, 'JWT_SECRET', { expiresIn: '1h' });
 
   res.cookie('token', token, {
     httpOnly: true,
@@ -120,7 +120,7 @@ app.get('/auth-check', (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.json({ authenticated: false });
 
-  jwt.verify(token, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', (err) => {
+  jwt.verify(token, 'JWT_SECRET', (err) => {
     if (err) {
       return res.json({ authenticated: false });
     }
@@ -196,7 +196,7 @@ app.get('/scrape', async (req, res) => {
     return res.status(401).json({ error: 'Unauthorized. Please log in.' });
   }
 
-  jwt.verify(token, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', async (err, decoded) => {
+  jwt.verify(token, 'JWT_SECRET', async (err, decoded) => {
     if (err) {
       return res.status(403).json({ error: 'Invalid token' });
     }
@@ -275,7 +275,7 @@ cron.schedule('* * * * *', async () => {
   }
 });
 
-
+const PORT = process.env.PORT
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
