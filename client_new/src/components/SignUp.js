@@ -20,7 +20,7 @@ export default function SignUp() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get("https://bargain-hunter.onrender.com/auth-check", {
+        const response = await axios.get("https://bargain-hunter.onrender.com:3000/auth-check", {
           withCredentials: true,
         });
         if (response.data.authenticated) {
