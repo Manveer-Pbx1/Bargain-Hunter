@@ -187,7 +187,7 @@ app.delete("/products/:id", async (req, res) => {
 
 app.get('/scrape', async (req, res) => {
   const url = req.query.url;  
-  const token = req.cookies.vercel-feature-flags;
+  const token = req.cookies.token;
 
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized. Please log in.' });
