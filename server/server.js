@@ -12,10 +12,7 @@ const cron = require('node-cron');
 const app = express();
 require('dotenv').config();
 
-app.use(cors({
-  origin: '0.0.0.0', 
-  credentials: true, 
-}));
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 connectDB();
