@@ -20,8 +20,7 @@ export default function SignUp() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get("https://bargain-hunter.onrender.com:3001/auth-check", {
-          withCredentials: true,
+        const response = await axios.get("https://bargain-hunter.onrender.com/auth-check", {
         });
         if (response.data.authenticated) {
           sessionStorage.setItem("username", formData.username);
@@ -56,7 +55,6 @@ export default function SignUp() {
           email: formData.email,
           password: formData.password,
         },
-        { withCredentials: true }
       );
       if (response.data.success) {
         setIsVerificationSent(true); // Set to show verification input
@@ -77,7 +75,6 @@ export default function SignUp() {
           email: formData.email,
           verificationCode: formData.verificationCode,
         },
-        { withCredentials: true }
       );
 
       if (response.data.success) {
